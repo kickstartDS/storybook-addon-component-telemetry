@@ -3,7 +3,9 @@
   "version": "0.0.0",
   "description": "Displays statistics associated with the viewed component",
   "keywords": [
-    "component", "telemetry", "storybook-addons"
+    "component",
+    "telemetry",
+    "storybook-addons"
   ],
   "repository": {
     "type": "git",
@@ -43,6 +45,9 @@
     "@babel/preset-env": "^7.12.1",
     "@babel/preset-react": "^7.12.5",
     "@babel/preset-typescript": "^7.13.0",
+    "@kickstartds/base": "^1.6.0-next.13",
+    "@kickstartds/content": "^1.6.0-next.13",
+    "@kickstartds/core": "^1.6.0-next.13",
     "@storybook/addon-essentials": "^6.4.0",
     "@storybook/react": "^6.4.0",
     "auto": "^10.3.0",
@@ -81,8 +86,13 @@
   "storybook": {
     "displayName": "Component Telemetry",
     "supportedFrameworks": [
-      "react", "html"
+      "react",
+      "html"
     ],
     "icon": "https://user-images.githubusercontent.com/321738/63501763-88dbf600-c4cc-11e9-96cd-94adadc2fd72.png"
+  },
+  "dependencies": {
+    "@influxdata/influxdb-client-browser": "^1.24.0",
+    "@kickstartds/design-system": "^2.0.1"
   }
 }
