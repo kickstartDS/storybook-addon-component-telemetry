@@ -36,19 +36,6 @@ interface TabContentProps {
 }
 
 export const TabContent: React.FC<TabContentProps> = ({ componentType, componentUses, componentPropStats }) => {
-  const loadableComponents:any = [];
-  Object.keys(componentUses).map(() => {
-    loadableComponents.push(components[componentType]);
-  });
-
-  console.log('components', loadableComponents);
-
-  const [componentsLoaded, setComponentsLoaded] = useState(false);
-
-  useEffect(() => {
-    Promise.all(loadableComponents.map((component:any) => component.load())).then(() => setComponentsLoaded(true));
-  }, [componentUses]);
-
   const enums: Record<string, any>[] = [];
   for (const [key, value] of Object.entries(componentPropStats)) {
     if (value.type === 'enum') {
@@ -63,6 +50,19 @@ export const TabContent: React.FC<TabContentProps> = ({ componentType, component
       })
     }
   }
+
+  console.log('enums', enums);
+
+  const loadableComponents:any = [];
+  Object.keys(componentUses).map(() => {
+    loadableComponents.push(components[componentType]);
+  });
+
+  const [componentsLoaded, setComponentsLoaded] = useState(false);
+
+  useEffect(() => {
+    Promise.all(loadableComponents.map((component:any) => component.load())).then(() => setComponentsLoaded(true));
+  }, [componentUses]);
 
   // TODO write human-friendly version of `componentType` in headlines
   // TODO use columns in `Preview` for low-width components (Button, Content Box, etc)

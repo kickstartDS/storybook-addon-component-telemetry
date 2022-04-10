@@ -62,11 +62,11 @@ export const Tab: React.FC<TabProps> = ({ active }) => {
                 break;
               case 'enum':
                 propStats[fieldKey] = propStats[fieldKey] || { type: 'enum', distribution: {} };
-                propStats[fieldKey]['distribution'][value] = propStats[fieldKey][value] ? propStats[fieldKey][value] + 1 : 1;
+                propStats[fieldKey]['distribution'][value] = propStats[fieldKey]['distribution'][value] ? propStats[fieldKey]['distribution'][value] + 1 : 1;
                 break;
               case 'boolean':
                 propStats[fieldKey] = propStats[fieldKey] || { type: 'boolean', distribution: {} };
-                propStats[fieldKey]['distribution'][value] = propStats[fieldKey][value.toString()] ? propStats[fieldKey][value.toString()] + 1 : 1;
+                propStats[fieldKey]['distribution'][value] = propStats[fieldKey]['distribution'][value.toString()] ? propStats[fieldKey]['distribution'][value.toString()] + 1 : 1;
                 break;
             }
           }
