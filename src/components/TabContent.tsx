@@ -4,7 +4,7 @@ import { styled } from "@storybook/theming";
 import { Title, Preview } from "@storybook/components";
 import { ResponsiveRadar } from '@nivo/radar';
 
-import { Visual } from "@kickstartds/content/lib/visual";
+import components from "./ComponentMap";
 import { Section } from "@kickstartds/base/lib/section";
 
 // TODO fix leakage of styles into general Storybook interface (see e.g. story navigation)
@@ -29,11 +29,14 @@ const TabInner = styled.div({
 });
 
 interface TabContentProps {
+  componentType: string
   componentUses: Record<string, any>
   componentPropStats: Record<string, any>
 }
 
-export const TabContent: React.FC<TabContentProps> = ({ componentUses, componentPropStats }) => {
+export const TabContent: React.FC<TabContentProps> = ({ componentType, componentUses, componentPropStats }) => {
+  const Component = components[componentType];
+
   const enums: Record<string, any>[] = [];
   for (const [key, value] of Object.entries(componentPropStats)) {
     if (value.type === 'enum') {
@@ -42,24 +45,26 @@ export const TabContent: React.FC<TabContentProps> = ({ componentUses, component
         values: Object.keys(value.distribution).map((distributionName) => { 
           const entry: any = {};
           entry[key.split('.').pop()] = distributionName;
-          entry['visual'] = value.distribution[distributionName];
+          entry[componentType] = value.distribution[distributionName];
           return entry;
         })
       })
     }
   }
 
+  // TODO write human-friendly version of `componentType` in headlines
+  // TODO use columns in `Preview` for low-width components (Button, Content Box, etc)
   return (
     <TabWrapper>
       <TabInner>
-        <Section headline={{ content: 'Usage statistics for Visual component' }} width="max" mode="tile" spaceBefore="none" spaceAfter="small">
-          {enums.map((enumVal) => {
+        <Section key="section-1" headline={{ content: `Usage statistics for ${componentType}` }} width="max" mode="tile" spaceBefore="none" spaceAfter="small">
+          {enums.map((enumVal, index) => {
             return (
-              <div style={{ height: '280px' }}>
+              <div key={index} style={{ height: '280px' }}>
                 <Title>{enumVal.title}</Title>
                 <ResponsiveRadar
                   data={enumVal.values}
-                  keys={[ 'visual' ]}
+                  keys={[ componentType ]}
                   indexBy={enumVal.title.split('.').pop()}
                   valueFormat=">-.2f"
                   margin={{ top: 70, right: 80, bottom: 40, left: 80 }}
@@ -77,19 +82,19 @@ export const TabContent: React.FC<TabContentProps> = ({ componentUses, component
           })}
         </Section>
 
-        <Section headline={{ content: 'All uses of Visual component' }} width="max" mode="list" spaceBefore="none" spaceAfter="none">
-          {componentUses && Object.keys(componentUses).length && Object.keys(componentUses).map((componentUse) => {
+        <Section key="section-2" headline={{ content: `All uses of ${componentType}` }} width="max" mode="list" spaceBefore="none" spaceAfter="none">
+          {componentUses && Object.keys(componentUses).length && Object.keys(componentUses).map((componentUse, index) => {
             return (
-              <>
+              <div key={index}>
                 <Title>Component: {componentUse}</Title>
                 <Preview isExpanded={false} withSource={{
                   language: 'json',
                   code: JSON.stringify(componentUses[componentUse], null, 2),
                   format: true,
                 }}>
-                  <Visual {...componentUses[componentUse]} />
+                  <Component {...componentUses[componentUse]} />
                 </Preview>
-              </>
+              </div>
             );
           })}
         </Section>

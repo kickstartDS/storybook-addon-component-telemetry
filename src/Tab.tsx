@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ForwardRefExoticComponent } from "react";
 import { useMemo } from "react";
 import { useParameter } from "@storybook/api";
 import { PARAM_KEY } from "./constants";
@@ -25,7 +25,7 @@ const getType = (schema: JSONSchema7, key: string): string => {
 };
 
 export const Tab: React.FC<TabProps> = ({ active }) => {
-  const { jsonschema } = useParameter<{jsonschema: JSONSchema7}>(PARAM_KEY, { jsonschema: {} });
+  const { jsonschema } = useParameter<{ jsonschema: JSONSchema7 }>(PARAM_KEY, { jsonschema: {} });
   const componentType = getSchemaName(jsonschema.$id);
 
   const queryApi = new InfluxDB({ url, token }).getQueryApi(org);
@@ -53,20 +53,22 @@ export const Tab: React.FC<TabProps> = ({ active }) => {
             uses[id][field] = value;
           }
 
-          const propType = getType(jsonschema, fieldKey);
-          switch (propType) {
-            case 'string':
-              propStats[fieldKey] = propStats[fieldKey] || { type: 'string', lengths: [] };
-              propStats[fieldKey]['lengths'].push(value.length)
-              break;
-            case 'enum':
-              propStats[fieldKey] = propStats[fieldKey] || { type: 'enum', distribution: {} };
-              propStats[fieldKey]['distribution'][value] = propStats[fieldKey][value] ? propStats[fieldKey][value] + 1 : 1;
-              break;
-            case 'boolean':
-              propStats[fieldKey] = propStats[fieldKey] || { type: 'boolean', distribution: {} };
-              propStats[fieldKey]['distribution'][value] = propStats[fieldKey][value.toString()] ? propStats[fieldKey][value.toString()] + 1 : 1;
-              break;
+          if (!fieldKey.includes('childImageSharp')) {
+            const propType = getType(jsonschema, fieldKey);
+            switch (propType) {
+              case 'string':
+                propStats[fieldKey] = propStats[fieldKey] || { type: 'string', lengths: [] };
+                propStats[fieldKey]['lengths'].push(value.length)
+                break;
+              case 'enum':
+                propStats[fieldKey] = propStats[fieldKey] || { type: 'enum', distribution: {} };
+                propStats[fieldKey]['distribution'][value] = propStats[fieldKey][value] ? propStats[fieldKey][value] + 1 : 1;
+                break;
+              case 'boolean':
+                propStats[fieldKey] = propStats[fieldKey] || { type: 'boolean', distribution: {} };
+                propStats[fieldKey]['distribution'][value] = propStats[fieldKey][value.toString()] ? propStats[fieldKey][value.toString()] + 1 : 1;
+                break;
+            }
           }
 
           // TODO also add `default` uses implied by respective schema (e.g. `background="default"`)
@@ -86,5 +88,5 @@ export const Tab: React.FC<TabProps> = ({ active }) => {
     componentUses[componentUse] = unpack(componentUses[componentUse]);
   });
 
-  return active ? <TabContent componentUses={componentUses} componentPropStats={componentPropStats} /> : null;
+  return active ? <TabContent componentType={componentType} componentUses={componentUses} componentPropStats={componentPropStats} /> : null;
 };

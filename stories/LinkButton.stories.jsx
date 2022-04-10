@@ -1,13 +1,13 @@
 import { pack } from "@kickstartds/core/lib/storybook/helpers";
-import buttonStories, {
+import linkButtonStories, {
   Template,
-} from "@kickstartds/base/lib/button/button.stories";
-import schema from "@kickstartds/base/lib/button/button.schema.dereffed.json";
+} from "@kickstartds/base/lib/link-button/link-button.stories";
+import schema from "@kickstartds/base/lib/link-button/link-button.schema.dereffed.json";
 
 export default {
-  ...buttonStories,
+  ...linkButtonStories,
   parameters: {
-    ...buttonStories.parameters,
+    ...linkButtonStories.parameters,
     telemetry: {
       jsonschema: schema,
     },
