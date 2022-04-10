@@ -1,12 +1,13 @@
 import React from "react";
 import { styled } from "@storybook/theming";
 
-import { Title, Preview, Spaced } from "@storybook/components";
+import { Title, Preview } from "@storybook/components";
 import { ResponsiveRadar } from '@nivo/radar';
 
 import { Visual, VisualContextDefault, VisualContext } from "@kickstartds/content/lib/visual";
 import { Section } from "@kickstartds/base/lib/section";
 
+// TODO fix leakage of styles into general Storybook interface (see e.g. story navigation)
 import "@kickstartds/core/lib/design-tokens/tokens.css";
 import "@kickstartds/base/lib/global/base.js";
 import "@kickstartds/base/lib/global/base.css";
@@ -28,7 +29,8 @@ const TabInner = styled.div({
 });
 
 const WrappedVisual = (props: Record<string, any>) => {
-  console.log('props', props);
+  // TODO move `https://www.kickstartds.com` to data ingestion phase in gatsby theme
+  // maybe even do all of this post-processing there, instead of needing Providers here
   if (props.media && props.media.image) {
     if (props.media.image.srcDesktop && props.media.image.srcDesktop.publicURL) {
       props.media.image.srcDesktop = `https://www.kickstartds.com${props.media.image.srcDesktop.publicURL}`;
