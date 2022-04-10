@@ -34,7 +34,6 @@ interface TabContentProps {
 }
 
 export const TabContent: React.FC<TabContentProps> = ({ componentUses, componentPropStats }) => {
-  console.log('componentPropStats', componentPropStats);
   const enums: Record<string, any>[] = [];
   for (const [key, value] of Object.entries(componentPropStats)) {
     if (value.type === 'enum') {
