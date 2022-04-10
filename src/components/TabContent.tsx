@@ -87,7 +87,7 @@ export const TabContent: React.FC<TabContentProps> = ({ componentType, component
             return (
               <div key={index}>
                 <Title>Component: {componentUse}</Title>
-                <Preview isExpanded={false} withSource={{
+                <Preview withToolbar isExpanded={false} withSource={{
                   language: 'json',
                   code: JSON.stringify(componentUses[componentUse], null, 2),
                   format: true,

@@ -32,7 +32,7 @@ export const Tab: React.FC<TabProps> = ({ active }) => {
   const fluxQuery =
     `from(bucket:"${bucket}") |> range(start: -3d) |> filter(fn: (r) => r._measurement == "components") |> filter(fn: (r) => r.componentName == "${componentType}")`;
 
-  const { uses: componentUses, propStats: componentPropStats} = useMemo(() => {
+  const { uses: componentUses, propStats: componentPropStats } = useMemo(() => {
     const uses: any = {};
     const propStats: any = {};
 
@@ -78,6 +78,7 @@ export const Tab: React.FC<TabProps> = ({ active }) => {
         console.error(error)
       });
 
+    // TODO sort uses, propStats sensibly
     return {
       uses,
       propStats
