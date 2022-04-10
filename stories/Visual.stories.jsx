@@ -8,14 +8,8 @@ export default {
   ...visualStories,
   parameters: {
     ...visualStories.parameters,
-    jsonschema: schema,
-    componenttelemetry: {
+    telemetry: {
       jsonschema: schema,
-      code: `
-<MyComponent boolProp scalarProp={1} complexProp={{ foo: 1, bar: '2' }}>
-  <SomeOtherComponent funcProp={(a) => a.id} />
-</MyComponent>
-      `,
     },
   },
 };

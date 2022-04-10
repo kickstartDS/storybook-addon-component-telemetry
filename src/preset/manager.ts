@@ -10,9 +10,9 @@ addons.register(ADDON_ID, () => {
     type: types.TAB,
     title: "Telemetry",
     //👇 Checks the current route for the story
-    route: ({ storyId }) => `/myaddon/${storyId}`,
-    //👇 Shows the Tab UI element in myaddon view mode
-    match: ({ viewMode }) => viewMode === "myaddon",
+    route: ({ storyId }) => `/telemetry/${storyId}`,
+    //👇 Shows the Tab UI element in telemetry view mode
+    match: ({ viewMode }) => viewMode === "telemetry",
     render: Tab,
   });
 });
