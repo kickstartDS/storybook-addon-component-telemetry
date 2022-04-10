@@ -1,7 +1,8 @@
 import React from "react";
 import { styled } from "@storybook/theming";
+import { useEffect, useState } from "react";
 
-import { Title, Preview } from "@storybook/components";
+import { Title, Preview, Story } from "@storybook/components";
 import { ResponsiveRadar } from '@nivo/radar';
 
 import components from "./ComponentMap";
@@ -35,7 +36,18 @@ interface TabContentProps {
 }
 
 export const TabContent: React.FC<TabContentProps> = ({ componentType, componentUses, componentPropStats }) => {
-  const Component = components[componentType];
+  const loadableComponents:any = [];
+  Object.keys(componentUses).map(() => {
+    loadableComponents.push(components[componentType]);
+  });
+
+  console.log('components', loadableComponents);
+
+  const [componentsLoaded, setComponentsLoaded] = useState(false);
+
+  useEffect(() => {
+    Promise.all(loadableComponents.map((component:any) => component.load())).then(() => setComponentsLoaded(true));
+  }, [componentUses]);
 
   const enums: Record<string, any>[] = [];
   for (const [key, value] of Object.entries(componentPropStats)) {
@@ -82,8 +94,9 @@ export const TabContent: React.FC<TabContentProps> = ({ componentType, component
           })}
         </Section>
 
-        <Section key="section-2" headline={{ content: `All uses of ${componentType}` }} width="max" mode="list" spaceBefore="none" spaceAfter="none">
+        {componentsLoaded && <Section key="section-2" headline={{ content: `All uses of ${componentType}` }} width="max" mode="list" spaceBefore="none" spaceAfter="none">
           {componentUses && Object.keys(componentUses).length && Object.keys(componentUses).map((componentUse, index) => {
+            const Component = loadableComponents[index];
             return (
               <div key={index}>
                 <Title>Component: {componentUse}</Title>
@@ -97,7 +110,7 @@ export const TabContent: React.FC<TabContentProps> = ({ componentType, component
               </div>
             );
           })}
-        </Section>
+        </Section>}
       </TabInner>
     </TabWrapper>
 )
