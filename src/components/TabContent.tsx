@@ -1,6 +1,9 @@
 import React from "react";
 import { styled } from "@storybook/theming";
-import { Title, Source, Preview } from "@storybook/components";
+
+import { Title, Preview, Spaced } from "@storybook/components";
+import { ResponsiveRadar } from '@nivo/radar';
+
 import { Visual, VisualContextDefault, VisualContext } from "@kickstartds/content/lib/visual";
 import { Section } from "@kickstartds/base/lib/section";
 
@@ -52,31 +55,167 @@ interface TabContentProps {
   componentUses: Record<string, any>;
 }
 
-export const TabContent: React.FC<TabContentProps> = ({ componentUses }) => (
-  <TabWrapper>
-    <TabInner>
-      <Section headline={{ content: 'Usage statistics for Visual component' }} width="max" mode="list" spaceBefore="none" spaceAfter="small">
-        <p>Coming soon...</p>
-      </Section>
+export const TabContent: React.FC<TabContentProps> = ({ componentUses }) => {
+  const data = [
+    {
+      "taste": "fruity",
+      "chardonay": 47,
+      "carmenere": 72,
+      "syrah": 95
+    },
+    {
+      "taste": "bitter",
+      "chardonay": 89,
+      "carmenere": 101,
+      "syrah": 79
+    },
+    {
+      "taste": "heavy",
+      "chardonay": 78,
+      "carmenere": 117,
+      "syrah": 32
+    },
+    {
+      "taste": "strong",
+      "chardonay": 92,
+      "carmenere": 42,
+      "syrah": 24
+    },
+    {
+      "taste": "sunny",
+      "chardonay": 43,
+      "carmenere": 45,
+      "syrah": 75
+    }
+  ];
 
-      <VisualProvider>
-        <Section headline={{ content: 'Real uses of Visual component' }} width="max" mode="list" spaceBefore="none" spaceAfter="none">
-          {componentUses && Object.keys(componentUses).length && Object.keys(componentUses).map((componentUse) => {
-            return (
-              <>
-                <Title>Component: {componentUse}</Title>
-                <Preview isExpanded={false} withSource={{
-                  language: 'json',
-                  code: JSON.stringify(componentUses[componentUse], null, 2),
-                  format: true,
-                }}>
-                  <Visual {...componentUses[componentUse]} />
-                </Preview>
-              </>
-            );
-          })}
+  return (
+    <TabWrapper>
+      <TabInner>
+        <Section headline={{ content: 'Usage statistics for Visual component' }} width="max" mode="tile" spaceBefore="none" spaceAfter="small">
+          <div style={{ height: '250px' }}>
+            <ResponsiveRadar
+              data={data}
+              keys={[ 'chardonay' ]}
+              indexBy="taste"
+              valueFormat=">-.2f"
+              margin={{ top: 70, right: 80, bottom: 40, left: 80 }}
+              borderColor={{ from: 'color' }}
+              gridLabelOffset={36}
+              dotSize={10}
+              dotColor={{ theme: 'background' }}
+              dotBorderWidth={2}
+              colors={{ scheme: 'nivo' }}
+              blendMode="multiply"
+              motionConfig="wobbly"
+            />
+          </div>
+          <div style={{ height: '250px' }}>
+            <ResponsiveRadar
+              data={data}
+              keys={[ 'chardonay' ]}
+              indexBy="taste"
+              valueFormat=">-.2f"
+              margin={{ top: 70, right: 80, bottom: 40, left: 80 }}
+              borderColor={{ from: 'color' }}
+              gridLabelOffset={36}
+              dotSize={10}
+              dotColor={{ theme: 'background' }}
+              dotBorderWidth={2}
+              colors={{ scheme: 'nivo' }}
+              blendMode="multiply"
+              motionConfig="wobbly"
+            />
+          </div>
+          <div style={{ height: '250px' }}>
+            <ResponsiveRadar
+              data={data}
+              keys={[ 'chardonay' ]}
+              indexBy="taste"
+              valueFormat=">-.2f"
+              margin={{ top: 70, right: 80, bottom: 40, left: 80 }}
+              borderColor={{ from: 'color' }}
+              gridLabelOffset={36}
+              dotSize={10}
+              dotColor={{ theme: 'background' }}
+              dotBorderWidth={2}
+              colors={{ scheme: 'nivo' }}
+              blendMode="multiply"
+              motionConfig="wobbly"
+            />
+          </div>
+          <div style={{ height: '250px' }}>
+            <ResponsiveRadar
+              data={data}
+              keys={[ 'chardonay' ]}
+              indexBy="taste"
+              valueFormat=">-.2f"
+              margin={{ top: 70, right: 80, bottom: 40, left: 80 }}
+              borderColor={{ from: 'color' }}
+              gridLabelOffset={36}
+              dotSize={10}
+              dotColor={{ theme: 'background' }}
+              dotBorderWidth={2}
+              colors={{ scheme: 'nivo' }}
+              blendMode="multiply"
+              motionConfig="wobbly"
+            />
+          </div>
+          <div style={{ height: '250px' }}>
+            <ResponsiveRadar
+              data={data}
+              keys={[ 'chardonay' ]}
+              indexBy="taste"
+              valueFormat=">-.2f"
+              margin={{ top: 70, right: 80, bottom: 40, left: 80 }}
+              borderColor={{ from: 'color' }}
+              gridLabelOffset={36}
+              dotSize={10}
+              dotColor={{ theme: 'background' }}
+              dotBorderWidth={2}
+              colors={{ scheme: 'nivo' }}
+              blendMode="multiply"
+              motionConfig="wobbly"
+            />
+          </div>
+          <div style={{ height: '250px' }}>
+            <ResponsiveRadar
+              data={data}
+              keys={[ 'chardonay' ]}
+              indexBy="taste"
+              valueFormat=">-.2f"
+              margin={{ top: 70, right: 80, bottom: 40, left: 80 }}
+              borderColor={{ from: 'color' }}
+              gridLabelOffset={36}
+              dotSize={10}
+              dotColor={{ theme: 'background' }}
+              dotBorderWidth={2}
+              colors={{ scheme: 'nivo' }}
+              blendMode="multiply"
+              motionConfig="wobbly"
+            />
+          </div>
         </Section>
-      </VisualProvider>
-    </TabInner>
-  </TabWrapper>
-);
+
+        <VisualProvider>
+          <Section headline={{ content: 'Real uses of Visual component' }} width="max" mode="list" spaceBefore="none" spaceAfter="none">
+            {componentUses && Object.keys(componentUses).length && Object.keys(componentUses).map((componentUse) => {
+              return (
+                <>
+                  <Title>Component: {componentUse}</Title>
+                  <Preview isExpanded={false} withSource={{
+                    language: 'json',
+                    code: JSON.stringify(componentUses[componentUse], null, 2),
+                    format: true,
+                  }}>
+                    <Visual {...componentUses[componentUse]} />
+                  </Preview>
+                </>
+              );
+            })}
+          </Section>
+        </VisualProvider>
+      </TabInner>
+    </TabWrapper>
+)
+};
