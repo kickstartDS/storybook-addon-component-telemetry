@@ -2,11 +2,12 @@ import React from "react";
 import { styled } from "@storybook/theming";
 import { useEffect, useState } from "react";
 
-import { Title, Preview, Story } from "@storybook/components";
+import { Title, Preview } from "@storybook/components";
 import { ResponsiveRadar } from '@nivo/radar';
 
 import components from "./ComponentMap";
 import { Section } from "@kickstartds/base/lib/section";
+import { Headline } from "@kickstartds/base/lib/headline";
 
 // TODO fix leakage of styles into general Storybook interface (see e.g. story navigation)
 import "@kickstartds/core/lib/design-tokens/tokens.css";
@@ -51,8 +52,6 @@ export const TabContent: React.FC<TabContentProps> = ({ componentType, component
     }
   }
 
-  console.log('enums', enums);
-
   const loadableComponents:any = [];
   Object.keys(componentUses).map(() => {
     loadableComponents.push(components[componentType]);
@@ -69,11 +68,14 @@ export const TabContent: React.FC<TabContentProps> = ({ componentType, component
   return (
     <TabWrapper>
       <TabInner>
-        <Section key="section-1" headline={{ content: `Usage statistics for ${componentType}` }} width="max" mode="tile" spaceBefore="none" spaceAfter="small">
+        <Section key="section-0" headline={{ content: `Telemetry for ${componentType}`, level: 'h1', pageHeader: true }} width="max" mode="list" spaceBefore="none" spaceAfter="small">
+          <p>Info about the general usage, the prop distribution and all existing uses of {componentType}</p>
+        </Section>
+        <Section key="section-1" headline={{ content: `Prop usage distributions for ${componentType}` }} width="max" mode="tile" spaceBefore="none" spaceAfter="small">
           {enums.map((enumVal, index) => {
             return (
               <div key={index} style={{ height: '280px' }}>
-                <Title>{enumVal.title}</Title>
+                <Headline content={enumVal.title} level="h3" styleAs="h4" spaceAfter="none" pageHeader={true} />
                 <ResponsiveRadar
                   data={enumVal.values}
                   keys={[ componentType ]}
@@ -99,7 +101,7 @@ export const TabContent: React.FC<TabContentProps> = ({ componentType, component
             const Component = loadableComponents[index];
             return (
               <div key={index}>
-                <Title>Component: {componentUse}</Title>
+                <Headline content={`Component: ${componentUse}`} level="h3" />
                 <Preview withToolbar isExpanded={false} withSource={{
                   language: 'json',
                   code: JSON.stringify(componentUses[componentUse], null, 2),

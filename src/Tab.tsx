@@ -1,6 +1,6 @@
-import React, { ForwardRefExoticComponent } from "react";
+import React from "react";
 import { useMemo } from "react";
-import { useParameter } from "@storybook/api";
+import { useParameter, useArgs } from "@storybook/api";
 import { PARAM_KEY } from "./constants";
 import { TabContent } from "./components/TabContent";
 import { unpack } from "@kickstartds/core/lib/storybook/helpers";
@@ -24,6 +24,13 @@ const getType = (schema: JSONSchema7, key: string): string => {
   return field.enum ? 'enum' : field.type.toString();
 };
 
+const getEnumValues = (schema: JSONSchema7, key: string): any => {
+  const segments = key.split('.');
+
+  const field = segments.reduce((prev, segment) => prev?.properties[segment] as JSONSchema7 || prev, schema);
+  return field.enum;
+};
+
 export const Tab: React.FC<TabProps> = ({ active }) => {
   const { jsonschema } = useParameter<{ jsonschema: JSONSchema7 }>(PARAM_KEY, { jsonschema: {} });
   const componentType = getSchemaName(jsonschema.$id);
@@ -32,9 +39,10 @@ export const Tab: React.FC<TabProps> = ({ active }) => {
   const fluxQuery =
     `from(bucket:"${bucket}") |> range(start: -3d) |> filter(fn: (r) => r._measurement == "components") |> filter(fn: (r) => r.componentName == "${componentType}")`;
 
-  const { uses: componentUses, propStats: componentPropStats } = useMemo(() => {
+  const [args] = useArgs();
+
+  const componentUses = useMemo(() => {
     const uses: any = {};
-    const propStats: any = {};
 
     // TODO move `https://www.kickstartds.com` to data ingestion phase in gatsby theme,
     // also clean up gatsby image URLs there
@@ -45,33 +53,22 @@ export const Tab: React.FC<TabProps> = ({ active }) => {
           const { id, _field: field, _value: value } = prop;
           const fieldKey = field.replace('.publicURL', '');
 
-          uses[id] = uses[id] || {};
+          if (!uses[id]) {
+            uses[id] = {};
+            Object.keys(args).forEach((arg) => {
+              // TODO `backgroundColor` check as a temp fix vor Visuals
+              if (!arg.includes('backgroundColor')) {
+                uses[id][arg] = args[arg];
+              }
+            });
+          }
+
           if (field.includes('childImageSharp')) {
           } else if (field.includes('publicURL')) {
             uses[id][fieldKey] = `https://www.kickstartds.com${value}`;
           } else {
             uses[id][field] = value;
           }
-
-          if (!fieldKey.includes('childImageSharp')) {
-            const propType = getType(jsonschema, fieldKey);
-            switch (propType) {
-              case 'string':
-                propStats[fieldKey] = propStats[fieldKey] || { type: 'string', lengths: [] };
-                propStats[fieldKey]['lengths'].push(value.length)
-                break;
-              case 'enum':
-                propStats[fieldKey] = propStats[fieldKey] || { type: 'enum', distribution: {} };
-                propStats[fieldKey]['distribution'][value] = propStats[fieldKey]['distribution'][value] ? propStats[fieldKey]['distribution'][value] + 1 : 1;
-                break;
-              case 'boolean':
-                propStats[fieldKey] = propStats[fieldKey] || { type: 'boolean', distribution: {} };
-                propStats[fieldKey]['distribution'][value] = propStats[fieldKey]['distribution'][value.toString()] ? propStats[fieldKey]['distribution'][value.toString()] + 1 : 1;
-                break;
-            }
-          }
-
-          // TODO also add `default` uses implied by respective schema (e.g. `background="default"`)
         });
       })
       .catch(error => {
@@ -79,13 +76,39 @@ export const Tab: React.FC<TabProps> = ({ active }) => {
       });
 
     // TODO sort uses, propStats sensibly
-    return {
-      uses,
-      propStats
-    };
+    return uses;
   }, [jsonschema]); // TODO check if `[jsonschema]` is really correct here...
 
+  const componentPropStats: any = {};
   Object.keys(componentUses).forEach((componentUse: string) => {
+    const use = componentUses[componentUse];
+
+    Object.keys(use).forEach((useArg) => {
+      const arg = use[useArg];
+
+      const propType = getType(jsonschema, useArg);
+      switch (propType) {
+        case 'string':
+          componentPropStats[useArg] = componentPropStats[useArg] || { type: 'string', lengths: [] };
+          componentPropStats[useArg]['lengths'].push(arg.length)
+          break;
+        case 'enum':
+          componentPropStats[useArg] = componentPropStats[useArg] || { type: 'enum', distribution: {} };
+          componentPropStats[useArg]['distribution'][arg] = componentPropStats[useArg]['distribution'][arg] ? componentPropStats[useArg]['distribution'][arg] + 1 : 1;
+  
+          const enumValues = getEnumValues(jsonschema, useArg);
+          enumValues.forEach((enumValue:any) => {
+            componentPropStats[useArg]['distribution'][enumValue] = componentPropStats[useArg]['distribution'][enumValue] ? componentPropStats[useArg]['distribution'][enumValue] : 0;
+          });
+  
+          break;
+        case 'boolean':
+          componentPropStats[useArg] = componentPropStats[useArg] || { type: 'boolean', distribution: {} };
+          componentPropStats[useArg]['distribution'][arg] = componentPropStats[useArg]['distribution'][arg.toString()] ? componentPropStats[useArg]['distribution'][arg.toString()] + 1 : 1;
+          break;
+      }
+    });
+
     componentUses[componentUse] = unpack(componentUses[componentUse]);
   });
 
