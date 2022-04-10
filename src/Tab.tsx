@@ -87,6 +87,7 @@ export const Tab: React.FC<TabProps> = ({ active }) => {
       const arg = use[useArg];
 
       const propType = getType(jsonschema, useArg);
+      // TODO handle number
       switch (propType) {
         case 'string':
           componentPropStats[useArg] = componentPropStats[useArg] || { type: 'string', lengths: [] };
@@ -94,11 +95,11 @@ export const Tab: React.FC<TabProps> = ({ active }) => {
           break;
         case 'enum':
           componentPropStats[useArg] = componentPropStats[useArg] || { type: 'enum', distribution: {} };
-          componentPropStats[useArg]['distribution'][arg] = componentPropStats[useArg]['distribution'][arg] ? componentPropStats[useArg]['distribution'][arg] + 1 : 1;
+          componentPropStats[useArg]['distribution'][arg?.replace('_', '-')] = componentPropStats[useArg]['distribution'][arg?.replace('_', '-')] ? componentPropStats[useArg]['distribution'][arg?.replace('_', '-')] + 1 : 1;
   
           const enumValues = getEnumValues(jsonschema, useArg);
           enumValues.forEach((enumValue:any) => {
-            componentPropStats[useArg]['distribution'][enumValue] = componentPropStats[useArg]['distribution'][enumValue] ? componentPropStats[useArg]['distribution'][enumValue] : 0;
+            componentPropStats[useArg]['distribution'][enumValue.replace('_', '-')] = componentPropStats[useArg]['distribution'][enumValue.replace('_', '-')] ? componentPropStats[useArg]['distribution'][enumValue.replace('_', '-')] : 0;
           });
   
           break;

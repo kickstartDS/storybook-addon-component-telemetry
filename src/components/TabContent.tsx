@@ -2,8 +2,9 @@ import React from "react";
 import { styled } from "@storybook/theming";
 import { useEffect, useState } from "react";
 
-import { Title, Preview } from "@storybook/components";
+import { Preview } from "@storybook/components";
 import { ResponsiveRadar } from '@nivo/radar';
+import { ResponsiveBar } from '@nivo/bar';
 
 import components from "./ComponentMap";
 import { Section } from "@kickstartds/base/lib/section";
@@ -36,19 +37,41 @@ interface TabContentProps {
   componentPropStats: Record<string, any>
 }
 
+const toTitleCase = (str: string) =>
+  str.replace('-', ' ').replace(
+    /\w\S*/g,
+    (txt) =>txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(),
+  );
+
 export const TabContent: React.FC<TabContentProps> = ({ componentType, componentUses, componentPropStats }) => {
-  const enums: Record<string, any>[] = [];
+  const radars: Record<string, any>[] = [];
+  const bars: Record<string, any>[] = [];
+
   for (const [key, value] of Object.entries(componentPropStats)) {
-    if (value.type === 'enum') {
-      enums.push({
-        title: key,
-        values: Object.keys(value.distribution).map((distributionName) => { 
-          const entry: any = {};
-          entry[key.split('.').pop()] = distributionName;
-          entry[componentType] = value.distribution[distributionName];
-          return entry;
+    // TODO handle number, boolean
+    switch (value.type) {
+      case 'enum':
+        radars.push({
+          title: key,
+          values: Object.keys(value.distribution).map((distributionName) => { 
+            const entry: any = {};
+            entry[key.split('.').pop()] = distributionName;
+            entry[componentType] = value.distribution[distributionName];
+            return entry;
+          })
         })
-      })
+        break;
+      case 'string':
+        bars.push({
+          title: key,
+          values: value.lengths.map((length: number, index: number) => {
+            return {
+              "bar": index,
+              "length": length,
+            };
+          }),
+        });
+        break;
     }
   }
 
@@ -68,11 +91,11 @@ export const TabContent: React.FC<TabContentProps> = ({ componentType, component
   return (
     <TabWrapper>
       <TabInner>
-        <Section key="section-0" headline={{ content: `Telemetry for ${componentType}`, level: 'h1', pageHeader: true }} width="max" mode="list" spaceBefore="none" spaceAfter="small">
-          <p>Info about the general usage, the prop distribution and all existing uses of {componentType}</p>
+        <Section key="section-0" headline={{ content: `Telemetry for ${toTitleCase(componentType)}`, level: 'h1', pageHeader: true }} width="max" mode="list" spaceBefore="none" spaceAfter="small">
+          <p>Info about the general usage, the prop distribution and all existing uses of {componentType} component</p>
         </Section>
-        <Section key="section-1" headline={{ content: `Prop usage distributions for ${componentType}` }} width="max" mode="tile" spaceBefore="none" spaceAfter="small">
-          {enums.map((enumVal, index) => {
+        {radars && <Section key="section-1" headline={{ content: `Option usage distributions for ${toTitleCase(componentType)}` }} width="max" mode="tile" spaceBefore="none" spaceAfter="small">
+          {radars.sort((a, b) => a.title < b.title ? -1 : 1).map((enumVal, index) => {
             return (
               <div key={index} style={{ height: '280px' }}>
                 <Headline content={enumVal.title} level="h3" styleAs="h4" spaceAfter="none" pageHeader={true} />
@@ -90,18 +113,64 @@ export const TabContent: React.FC<TabContentProps> = ({ componentType, component
                   colors={{ scheme: 'nivo' }}
                   blendMode="multiply"
                   motionConfig="wobbly"
+                  curve="cardinalClosed"
                 />
               </div>
             );
           })}
-        </Section>
+        </Section>}
 
-        {componentsLoaded && <Section key="section-2" headline={{ content: `All uses of ${componentType}` }} width="max" mode="list" spaceBefore="none" spaceAfter="none">
-          {componentUses && Object.keys(componentUses).length && Object.keys(componentUses).map((componentUse, index) => {
+        {bars && <Section key="section-2" headline={{ content: `String prop lengths for ${toTitleCase(componentType)}` }} width="max" mode="tile" spaceBefore="none" spaceAfter="small">
+          {bars.sort((a, b) => a.title < b.title ? -1 : 1).map((bar, index) => {
+            return (
+              <div key={index} style={{ width: '450px', height: '300px' }}>
+                <Headline content={bar.title} level="h3" styleAs="h4" spaceAfter="none" pageHeader={true} />
+                <ResponsiveBar
+                  data={bar.values}
+                  keys={[
+                    'length',
+                  ]}
+                  indexBy="bar"
+                  margin={{ top: 50, right: 130, bottom: 50, left: 60 }}
+                  padding={0.6}
+                  valueScale={{ type: 'linear' }}
+                  indexScale={{ type: 'band', round: true }}
+                  colors={{ scheme: 'nivo' }}
+                  axisTop={null}
+                  axisRight={null}
+                  axisBottom={{
+                    tickSize: 5,
+                    tickPadding: 5,
+                    tickRotation: 0,
+                  }}
+                  axisLeft={{
+                    tickSize: 5,
+                    tickPadding: 5,
+                    tickRotation: 0,
+                  }}
+                  labelSkipWidth={12}
+                  labelSkipHeight={12}
+                  labelTextColor={{
+                    from: 'color',
+                    modifiers: [
+                      [
+                        'darker',
+                        1.6
+                      ]
+                    ]
+                  }}
+                />
+              </div>
+            );
+          })}
+        </Section>}
+
+        {componentsLoaded && <Section key="section-3" headline={{ content: `All uses of ${toTitleCase(componentType)}` }} width="max" mode="list" spaceBefore="none" spaceAfter="none">
+          {componentUses && Object.keys(componentUses).length && Object.keys(componentUses).sort((a, b) => a < b ? -1 : 1).map((componentUse, index) => {
             const Component = loadableComponents[index];
             return (
               <div key={index}>
-                <Headline content={`Component: ${componentUse}`} level="h3" />
+                <Headline content={toTitleCase(componentUse.replace('-', ' '))} level="h3" />
                 <Preview withToolbar isExpanded={false} withSource={{
                   language: 'json',
                   code: JSON.stringify(componentUses[componentUse], null, 2),

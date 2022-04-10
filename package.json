@@ -96,6 +96,7 @@
     "@kickstartds/design-system": "^2.0.1",
     "@kickstartds/jsonschema2graphql": "^1.6.12",
     "@loadable/component": "^5.15.2",
+    "@nivo/bar": "^0.79.1",
     "@nivo/core": "^0.79.0",
     "@nivo/radar": "^0.79.1",
     "json-schema": "^0.4.0"
